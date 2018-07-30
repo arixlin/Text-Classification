@@ -5,18 +5,18 @@ import time
 from utils.prepare_data import *
 
 # Hyperparameters
-MAX_DOCUMENT_LENGTH = 25
-EMBEDDING_SIZE = 256
-HIDDEN_SIZE = 64
-BATCH_SIZE = 256
+MAX_DOCUMENT_LENGTH = 256
+EMBEDDING_SIZE = 64
+HIDDEN_SIZE = 128
+BATCH_SIZE = 32
 KEEP_PROB = 0.5
 epsilon = 5.0  # IMDB ideal norm length
 MAX_LABEL = 15
-epochs = 10
+epochs = 100
 
 # load data
-x_train, y_train = load_data("../dbpedia_data/dbpedia_csv/train.csv", sample_ratio=0.01)
-x_test, y_test = load_data("../dbpedia_data/dbpedia_csv/test.csv", sample_ratio=0.1)
+x_train, y_train = load_data("../wg_csv/train.csv", sample_ratio=0.5)
+x_test, y_test = load_data("../wg_csv/train.csv", sample_ratio=0.1)
 
 # data preprocessing
 x_train, x_test, vocab, vocab_size = \
@@ -123,7 +123,8 @@ with graph.as_default():
     embedding_perturbated = add_perturbation(batch_embedded, cl_loss)
     ad_logits, ad_loss = cal_loss_logit(embedding_perturbated, keep_prob, reuse=True)
     loss = cl_loss + ad_loss
-    optimizer = tf.train.AdamOptimizer(learning_rate=lr).minimize(loss)
+    # optimizer = tf.train.AdamOptimizer(learning_rate=lr).minimize(loss)
+    optimizer = tf.train.RMSPropOptimizer(learning_rate=lr).minimize(loss)
 
     # Accuracy metric
     prediction = tf.argmax(tf.nn.softmax(logits), 1)
